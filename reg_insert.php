@@ -15,12 +15,14 @@
     if ($password == $password2)
 	{
         $password = md5($password); //hashing password
-        $sql = "INSERT into registeredusers VALUES('','$lastname','$firstname','$email','$address','$phone','$password')";
+        $sql = "INSERT into registeredusers VALUES('','$lastname','$firstname','$email','$address','$phone','$password','')";
         mysqli_query($db, $sql);
-        echo 'Sikeres regisztráció<br>';
+        echo "Sikeres regisztráció!";
+
     }
     else 
-        echo 'A két jelszó nem egyezik<br>';
+        echo "A két jelszó nem egyezik";
+            
 
 ?>
 

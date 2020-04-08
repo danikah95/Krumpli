@@ -11,12 +11,12 @@ Regisztráció<br><br>
 <table>
 <tr><input type="text" name="Lastname" placeholder="Vezetéknév"><br>
 <tr><input type="text" name="Firstname" placeholder="Keresztnév"><br>
-<tr><input type="text" name="EMail" placeholder="E-mail"><br>
+<tr><input type="email" name="EMail" placeholder="E-mail"><br>
 <tr><input type="text" name="Address" placeholder="Cím"><br>
 <tr><input type="text" name="Phonenumber" placeholder="Telefonszám"><br>
-<tr><input type="text" name="UserPassword" placeholder="Jelszó"><br>
-<tr><input type="text" name="UserPassword2" placeholder="Jelszó újra"><br>
-<tr><input type="submit" name="reg_btn" value="Regisztráció">   
+<tr><input type="password" name="UserPassword" placeholder="Jelszó"><br>
+<tr><input type="password" name="UserPassword2" placeholder="Jelszó újra"><br>
+<tr><input type="submit" name="reg_btn" value="Regisztráció">  
 </table>
 </form>
 
