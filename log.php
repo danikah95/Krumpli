@@ -21,6 +21,7 @@ if (mysqli_num_rows($result) > 0) {
 		if($hpw == $row["UserPassword"])
 		{
 			echo "Sikeres bejelentkezés<br>";
+			header('Location: search.php');
 		}
 		else
 		{
