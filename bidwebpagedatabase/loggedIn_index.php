@@ -1,6 +1,38 @@
 <?php
-include ("include.php");
-$link = mysqli_connect($bhost, $buser, $bpasswd);
+	include ("alert_insert.php");
+	include ("include.php");
+	$link = mysqli_connect($bhost, $buser, $bpasswd);
+
+	session_start();
+	if(isset($_SESSION["bTechLoggedIn"]) && $_SESSION["bTechLoggedIn"] == true)
+	{
+		include ("include.php");
+		$conn = mysqli_connect($bhost, $buser, $bpasswd, $dbname);
+		if (!$conn)
+		{
+			die("Connection failed: " . mysqli_connect_error());
+		}
+		
+		$sessionEmail = $_SESSION["EMail"];
+		$Lastname = $Firstname = "";
+		
+		$sql = "SELECT Lastname, Firstname FROM registeredusers WHERE EMail like " . '"' . $sessionEmail . '"' . ";";
+		$result = mysqli_query($conn, $sql);
+		while($row = mysqli_fetch_assoc($result))
+		{
+			$Lastname = $row["Lastname"];
+			$Firstname = $row["Firstname"];
+		}
+		
+		$FullName = $Lastname . " " . $Firstname;
+		
+		mysqli_close($conn);
+	}
+	else
+	{
+		fun_alert ("Nincs bejelentkezve!", "login.php");
+	}
+
 
 //kapcsolat ellenőrzése
 if (mysqli_connect_errno()) {
@@ -39,10 +71,10 @@ while ($adatok=mysqli_fetch_array($item))
     $i++;
 }*/
 
+
 //lejárt hirdetések
 $sql = "DELETE FROM item WHERE enddate < NOW();";
 $link->query($sql);
-
 
 //keresés
 if(isset($_POST['search_btn']))
@@ -51,8 +83,7 @@ if(isset($_POST['search_btn']))
 				$category=$_POST['FokategoriaLista'];
 				$query = "SELECT `item`.*, `bid`.`BidPrice`
                            FROM `item`
-                           LEFT JOIN `bid` ON `bid`.`Item_ID` = `item`.`Item_ID`
-                           WHERE ((Category LIKE '%".$category."%') AND (Title LIKE '%".$valueToSearch."%'))";
+                           LEFT JOIN `bid` ON `bid`.`Item_ID` = `item`.`Item_ID` WHERE ((Category LIKE '%".$category."%') AND (Title LIKE '%".$valueToSearch."%'))";
 				$search_result = filterTable($query);
     
 			}
@@ -69,6 +100,7 @@ if(isset($_POST['search_btn']))
 				$filter_Result = mysqli_query($connect, $query);
 				return $filter_Result;
 			}
+
 
 ?>
 
@@ -97,20 +129,21 @@ if(isset($_POST['search_btn']))
   <!-- Navigation -->
   <nav class="navbar navbar-expand-lg navbar-dark bg-info fixed-top">
     <div class="container">
-      <a class="navbar-brand" href="index.php">B-Tech Vatera</a>
+      <a class="navbar-brand" href="loggedIn_index.php">B-Tech Vatera</a>
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
       <div class="collapse navbar-collapse" id="navbarResponsive">
         <ul class="navbar-nav ml-auto">
-          <li class="nav-item active">
-            <a class="nav-link" href="index.php">Főoldal</a>
+          
+          <li class="nav-item">
+            <a class="nav-link" href="hirdetesfeladas.php">Hirdetésfeladás</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="register.php">Regisztráció</a>
+            <a class="nav-link" href="kijelentkezes.php">Kijelentkezés</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="login.php">Bejelentkezés</a>
+            <span class="navbar-text font-weight-bold" id="user_name"><?php echo "Üdv " . $FullName . "!";?></span>
           </li>
         </ul>
       </div>
@@ -124,29 +157,29 @@ if(isset($_POST['search_btn']))
 
       <div class="col-lg-3">
 
+        
+         <!-- dropdown menü -->
+		 <form method="post">
+         <select class="selectpicker form-control" id="Fokategoria" name="FokategoriaLista" required>
+  			      <option value="" disabled selected>Kategóriák</option>
+  			      <option value="jarmu">Jármű</option>
+				      <option value="muszakiCikkek">Műszaki cikkek</option>
+				      <option value="szabadidoSport">Szabadidő, sport</option>
+				      <option value="ruhazat">Ruházat</option>
+				      <option value="otthonHaztartas">Otthon, háztartás</option>
+		        </select>
+           <!--/.dropdown menü -->
 
-    <!-- dropdown menü -->
-		<form method="post">
-		  <select class="selectpicker form-control" id="Fokategoria" name="FokategoriaLista">
-  			<option value="" disabled selected>Kategóriák</option>
-  			<option value="jarmu">Jármű</option>
-				<option value="muszakiCikkek">Műszaki cikkek</option>
-				<option value="szabadidoSport">Szabadidő, sport</option>
-				<option value="ruhazat">Ruházat</option>
-				<option value="otthonHaztartas">Otthon, háztartás</option>
-		  </select>
-    <!--/.dropdown menü -->
-		
           <!-- keresés -->
           <div class="input-group mb-3">
             <input type="text" name="search" class="form-control" placeholder="Mit keres?" aria-label="Mit keres?" aria-describedby="basic-addon2">
             <div class="input-group-append">
             <button class="btn btn-info btn-block btn-sm" type="submit" name="search_btn">Keresés</button>
           </div>
-		  
+
           <!-- /.keresés -->
+        </div>
       </div>
-    </div>
       <!-- /.col-lg-3 -->
 
       <div class="col-lg-9">
@@ -154,10 +187,9 @@ if(isset($_POST['search_btn']))
         <div class="row">
           
         
-      <?php
-			
-			
-			if (mysqli_num_rows($search_result) == 0) { 
+        <?php
+		
+		if (mysqli_num_rows($search_result) == 0) { 
 				 echo 'Nincs ilyen meghirdetett termék';
 			}
 			else
@@ -169,7 +201,7 @@ if(isset($_POST['search_btn']))
                     <a href="loggedIn_itempage.php?Item_ID='.$row['Item_ID'].'"><img class="card-img-top" src="Pictures/'.$row['Picture'].'" alt=""></a>
                         <div class="card-body">
                             <h4 class="card-title text-center">
-                              <a href="itempage.php?itemid='.$row['Item_ID'].'">'.$row['Title'].'</a>
+                              <a href="loggedIn_itempage.php?Item_ID='.$row['Item_ID'].'">'.$row['Title'].'</a>
                             </h4>
                             <h5>Jelenlegi licit: '.$row['BidPrice'].' Ft</h5>
                             <h6>Kezdő ár: '.$row['StartingPrice'].' Ft</h6>
@@ -179,13 +211,9 @@ if(isset($_POST['search_btn']))
                 </div>';
 				}
 			}
-			
-			
-			
-        
             //összes feladott hirdetés
 
-            /* if ($sorok == 0) {
+           /* if ($sorok == 0) {
               echo 'Nincs meghirdetett termék';
             }
 			
@@ -206,8 +234,6 @@ if(isset($_POST['search_btn']))
                 </div>';
             }
             */
-
-            
             ?>
           
         </div>
@@ -226,7 +252,7 @@ if(isset($_POST['search_btn']))
   <!-- Bootstrap core JavaScript -->
   <script src="vendor/jquery/jquery.min.js"></script>
   <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-  </form>
+</form>
 </body>
 
 </html>

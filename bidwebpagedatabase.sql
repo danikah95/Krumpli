@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Gép: 127.0.0.1
--- Létrehozás ideje: 2020. Ápr 03. 08:43
+-- Létrehozás ideje: 2020. Máj 26. 16:15
 -- Kiszolgáló verziója: 10.4.11-MariaDB
 -- PHP verzió: 7.4.2
 
@@ -49,21 +49,16 @@ CREATE TABLE `item` (
   `Title` varchar(40) COLLATE utf8mb4_hungarian_ci NOT NULL,
   `Description` varchar(150) COLLATE utf8mb4_hungarian_ci NOT NULL,
   `Category` varchar(20) COLLATE utf8mb4_hungarian_ci NOT NULL,
+  `Picture` varchar(100) COLLATE utf8mb4_hungarian_ci DEFAULT NULL,
   `User_ID` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_hungarian_ci;
 
--- --------------------------------------------------------
-
 --
--- Tábla szerkezet ehhez a táblához `pictures`
+-- A tábla adatainak kiíratása `item`
 --
 
-CREATE TABLE `pictures` (
-  `Item_ID` int(11) NOT NULL,
-  `Pic1` varchar(50) COLLATE utf8mb4_hungarian_ci DEFAULT NULL,
-  `Pic2` varchar(50) COLLATE utf8mb4_hungarian_ci DEFAULT NULL,
-  `Pic3` varchar(50) COLLATE utf8mb4_hungarian_ci DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_hungarian_ci;
+INSERT INTO `item` (`Item_ID`, `StartDate`, `EndDate`, `StartingPrice`, `Title`, `Description`, `Category`, `Picture`, `User_ID`) VALUES
+(5, '2020-05-26', '2020-06-23', 570, 'iPhone tok', 'eladó új iphone 8 tok', 'muszakiCikkek', 'case.jpg', 1);
 
 -- --------------------------------------------------------
 
@@ -81,6 +76,14 @@ CREATE TABLE `registeredusers` (
   `UserPassword` varchar(32) COLLATE utf8mb4_hungarian_ci NOT NULL,
   `AdminCheck` tinyint(1) DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_hungarian_ci;
+
+--
+-- A tábla adatainak kiíratása `registeredusers`
+--
+
+INSERT INTO `registeredusers` (`User_ID`, `Lastname`, `Firstname`, `EMail`, `Address`, `Phonenumber`, `UserPassword`, `AdminCheck`) VALUES
+(1, 'Horváth', 'Lajos', 'lali@email.hu', 'valami lakcím', '18651685', '1a1dc91c907325c69271ddf0c944bc72', 0),
+(2, 'Lakner ', 'Laci', 'laci@email.com', 'ahol a laci lakik', '12345678', '1a1dc91c907325c69271ddf0c944bc72', 0);
 
 --
 -- Indexek a kiírt táblákhoz
@@ -102,12 +105,6 @@ ALTER TABLE `item`
   ADD KEY `User_ID` (`User_ID`);
 
 --
--- A tábla indexei `pictures`
---
-ALTER TABLE `pictures`
-  ADD PRIMARY KEY (`Item_ID`);
-
---
 -- A tábla indexei `registeredusers`
 --
 ALTER TABLE `registeredusers`
@@ -121,19 +118,19 @@ ALTER TABLE `registeredusers`
 -- AUTO_INCREMENT a táblához `bid`
 --
 ALTER TABLE `bid`
-  MODIFY `Bid_ID` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `Bid_ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT a táblához `item`
 --
 ALTER TABLE `item`
-  MODIFY `Item_ID` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `Item_ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT a táblához `registeredusers`
 --
 ALTER TABLE `registeredusers`
-  MODIFY `User_ID` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `User_ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- Megkötések a kiírt táblákhoz
@@ -144,19 +141,13 @@ ALTER TABLE `registeredusers`
 --
 ALTER TABLE `bid`
   ADD CONSTRAINT `bid_ibfk_1` FOREIGN KEY (`User_ID`) REFERENCES `registeredusers` (`User_ID`),
-  ADD CONSTRAINT `bid_ibfk_2` FOREIGN KEY (`Item_ID`) REFERENCES `item` (`Item_ID`);
+  ADD CONSTRAINT `bid_ibfk_2` FOREIGN KEY (`Item_ID`) REFERENCES `item` (`Item_ID`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Megkötések a táblához `item`
 --
 ALTER TABLE `item`
   ADD CONSTRAINT `item_ibfk_1` FOREIGN KEY (`User_ID`) REFERENCES `registeredusers` (`User_ID`);
-
---
--- Megkötések a táblához `pictures`
---
-ALTER TABLE `pictures`
-  ADD CONSTRAINT `pictures_ibfk_1` FOREIGN KEY (`Item_ID`) REFERENCES `item` (`Item_ID`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

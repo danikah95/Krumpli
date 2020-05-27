@@ -1,22 +1,3 @@
-<?php
-	include ("include.php");
-// Create connection
-	$conn = mysqli_connect($bhost, $buser, $bpasswd, $dbname);
-// Check connection
-if (!$conn) {
-    die("Connection failed: " . mysqli_connect_error());
-}
-
-  $email = ($_POST['EMail']);
-	$password = ($_POST['UserPassword']);
-	$hpw=md5($password);
-
-
-	$sql = "SELECT UserPassword FROM registeredusers WHERE EMail='$email'";
-	$result = mysqli_query($conn, $sql);
-?>
-
-
 <head>
     <!-- Bootstrap core CSS -->
   <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
@@ -55,39 +36,52 @@ if (!$conn) {
   <!-- Page Content -->
 
 
-
-
   <?php
+	include ("include.php");
+	include ("alert_insert.php");
+// Create connection
+	$conn = mysqli_connect($bhost, $buser, $bpasswd, $dbname);
+// Check connection
+if (!$conn) {
+    die("Connection failed: " . mysqli_connect_error());
+}
 
-    if (mysqli_num_rows($result) > 0) 
-    {
+    $email = ($_POST['EMail']);
+	$password = ($_POST['UserPassword']);
+	$hpw=md5($password);
+
+
+	$sql = "SELECT UserPassword FROM registeredusers WHERE EMail='$email'";
+	$result = mysqli_query($conn, $sql);
+
+if (mysqli_num_rows($result) > 0)
+{
     // output data of each row
-        while($row = mysqli_fetch_assoc($result))
-        {
-		    if($hpw == $row["UserPassword"])
-		    {
-                echo
-                '<div class="alert alert-success text-center" role="alert">
-                    Sikeres bejelentkezés!
-                </div>';
-			    //header('Location: search.php');
-		    }
-		    else
-		    {
-                echo
-                '<div class="alert alert-danger text-center" role="alert">
-                    Sikertelen bejelentkezés
-                </div>';
-		    }
-        }
+    while($row = mysqli_fetch_assoc($result))
+	{
+		if($hpw == $row["UserPassword"])
+		{
+			//echo "Sikeres bejelentkezés<br>";
+			session_start();
+			$_SESSION["bTechLoggedIn"] = true;
+			$_SESSION["EMail"] = $email;
+			//header('Location: loggedIn_index.php');
+			fun_alert ("Sikeres bejelentkezés!", "loggedIn_index.php");
+		}
+		else
+		{
+			fun_alert ("Sikertelen bejelentkezés! Próbálja újra.", "login.php");
+			//header('Location: login.php');
+		}
     }
-    else 
-    {
-        echo "0 results";
-    }
+}
+else
+{
+    fun_alert ("Sikertelen bejelentkezés! Próbálja újra.", "login.php");
+	//header('Location: login.php');
+}
 
 mysqli_close($conn);
-
 ?>
   <!-- /.container -->
 

@@ -1,20 +1,3 @@
-<?php
-    include ("include.php");
-    $db = mysqli_connect($bhost,$buser,$bpasswd);
-
-    $lastname = ($_POST['Lastname']);
-    $firstname = ($_POST['Firstname']);
-    $email = ($_POST['EMail']);
-    $address = ($_POST['Address']);
-    $phone = ($_POST['Phonenumber']);
-    $password = ($_POST['UserPassword']);
-    $password2 = ($_POST['UserPassword2']);
-
-
-  mysqli_select_db($db,'bidwebpagedatabase');
-
-?>
-
 <head>
     <!-- Bootstrap core CSS -->
   <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
@@ -53,30 +36,34 @@
   <!-- Page Content -->
 
 
-<?php
+  <?php
+    include ("include.php");
+    include ("alert_insert.php");
+    $db = mysqli_connect($bhost,$buser,$bpasswd);
 
+    $lastname = ($_POST['Lastname']);
+    $firstname = ($_POST['Firstname']);
+    $email = ($_POST['EMail']);
+    $address = ($_POST['Address']);
+    $phone = ($_POST['Phonenumber']);
+    $password = ($_POST['UserPassword']);
+    $password2 = ($_POST['UserPassword2']);
+
+
+	mysqli_select_db($db,'bidwebpagedatabase');
   if ($password == $password2)
 	{
-        $password = md5($password); //hashing password
-        $sql = "INSERT into registeredusers VALUES('','$lastname','$firstname','$email','$address','$phone','$password','')";
-        mysqli_query($db, $sql);
-        echo
-        '<div class="alert alert-success text-center" role="alert">
-            <strong>Sikeres regisztráció!</strong> Most már bejelentkezhet!
-        </div>';
-
+    $password = md5($password); //hashing password
+    $sql = "INSERT into registeredusers VALUES('','$lastname','$firstname','$email','$address','$phone','$password','')";
+    mysqli_query($db, $sql);
+    //echo "Sikeres regisztráció!";
+		fun_alert ("Sikeres regisztráció!", "index.php");
   }
-  else 
-        echo
-        '<div class="signup-form">	
-            <div class="form-group">
-                <div class="alert alert-danger text-center" role="alert">
-                    <strong>A két jelszó nem egyezik</strong>
-                </div>
-                <a href="register.php" class="btn btn-info btn-block btn-lg" role="button" id="prev_btn">Vissza</a>
-            </div>
-        </div>';
-            
+  else
+	{
+    //echo "A két jelszó nem egyezik";
+		fun_alert ("A két jelszó nem egyezik!", "register.php");
+	}
 
 ?>
   <!-- /.container -->
