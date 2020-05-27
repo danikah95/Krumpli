@@ -48,7 +48,7 @@ if ($result = mysqli_query($link, "SELECT DATABASE()")) {
 }
 
 //hirdetések lekérdezése
-$item=mysqli_query($link, "SELECT `item`.*, `bid`.`BidPrice`
+/*$item=mysqli_query($link, "SELECT `item`.*, `bid`.`BidPrice`
                            FROM `item`
                            LEFT JOIN `bid` ON `bid`.`Item_ID` = `item`.`Item_ID`;");
 $sorok=mysqli_num_rows($item);
@@ -69,8 +69,14 @@ while ($adatok=mysqli_fetch_array($item))
     $User_ID [$i]=$adatok[8];
     $BidPrice[$i]=$adatok[9];
     $i++;
-}
+}*/
 
+
+//lejárt hirdetések
+$sql = "DELETE FROM item WHERE enddate < NOW();";
+$link->query($sql);
+
+//keresés
 if(isset($_POST['search_btn']))
 			{
 				$valueToSearch = $_POST['search'];
@@ -137,7 +143,7 @@ if(isset($_POST['search_btn']))
             <a class="nav-link" href="kijelentkezes.php">Kijelentkezés</a>
           </li>
           <li class="nav-item">
-            <span class="navbar-text" id="user_name"><?php echo "Üdv " . $FullName . "!";?></span>
+            <span class="navbar-text font-weight-bold" id="user_name"><?php echo "Üdv " . $FullName . "!";?></span>
           </li>
         </ul>
       </div>
@@ -191,11 +197,11 @@ if(isset($_POST['search_btn']))
 				while($row = mysqli_fetch_array($search_result))
 				{
 				echo '<div class="col-lg-4 col-md-6 mb-4">
-                    <div class="card h-100">
-                    <a href="#"><img class="card-img-top" src="Pictures/'.$row['Picture'].'" alt=""></a>
+                    <div class="card text-justify h-100">
+                    <a href="loggedIn_itempage.php?Item_ID='.$row['Item_ID'].'"><img class="card-img-top" src="Pictures/'.$row['Picture'].'" alt=""></a>
                         <div class="card-body">
-                            <h4 class="card-title">
-                                <a href="#">'.$row['Title'].'</a>
+                            <h4 class="card-title text-center">
+                              <a href="loggedIn_itempage.php?Item_ID='.$row['Item_ID'].'">'.$row['Title'].'</a>
                             </h4>
                             <h5>Jelenlegi licit: '.$row['BidPrice'].' Ft</h5>
                             <h6>Kezdő ár: '.$row['StartingPrice'].' Ft</h6>
@@ -205,16 +211,12 @@ if(isset($_POST['search_btn']))
                 </div>';
 				}
 			}
-			
-			
-			
-        
             //összes feladott hirdetés
 
-            if ($sorok == 0) {
+           /* if ($sorok == 0) {
               echo 'Nincs meghirdetett termék';
             }
-			/*
+			
             for ($i = 0; $i < $sorok; $i++)
             {
                 echo '<div class="col-lg-4 col-md-6 mb-4">

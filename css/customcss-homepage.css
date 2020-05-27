@@ -15,6 +15,10 @@
     color: #ffffff;
 }
 
+#itemname:hover{
+    text-decoration: none;
+}
+
 .card-img-top {
     width: 100%;
     height: 18vw;
@@ -89,4 +93,14 @@
 }
 .signup-form a:hover {
     text-decoration: none;
+}
+
+.card-title a{
+    text-decoration: none;
+    color: #17a2b8;
+}
+
+.card-title a:hover{
+    text-decoration: none;
+    color: #000000;
 }
