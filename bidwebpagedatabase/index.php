@@ -39,10 +39,43 @@ while ($adatok=mysqli_fetch_array($item))
     $i++;
 }*/
 
+//SAJÁT RÉSZ------------------------------
+$sql = "SELECT Item_ID, EndDate, StartingPrice, Title, User_ID FROM Item WHERE enddate < NOW();";
+$result = mysqli_query($link, $sql);
+while($row = mysqli_fetch_assoc($result))
+{
+	$soldItem_ItemID = $row['Item_ID'];
+	$soldItem_EndDate = $row['EndDate'];
+	$soldItem_StartingPrice = $row['StartingPrice'];
+	$soldItem_Title = $row['Title'];
+	$soldItem_UserID = $row['User_ID'];
+	
+	$sql_in = "SELECT COUNT(*) as db, b.BidPrice, ru.Lastname, ru.Firstname, ru.EMail FROM bid b join registeredusers ru on b.User_ID = ru.User_ID WHERE Item_ID = '$soldItem_ItemID';";
+	$result_in = mysqli_query($link, $sql_in);
+	while($row_in = mysqli_fetch_assoc($result_in))
+	{
+		$checkBid = $row_in['db'];
+		$buyer_Price = $row_in['BidPrice'];
+		$buyer_Name = $row_in['Lastname'] . " " . $row_in['Firstname'];
+		$buyer_EMail = $row_in['EMail'];
+	}
+	
+	if ($checkBid > 0)
+	{
+		$sql_in = "INSERT INTO SoldItems (Seller_UserID, Seller_SoldItemName, Seller_SoldItemStartingPrice, Buyer_BidPrice, Buyer_EMail, Buyer_Name, Seller_AuctionEndDate) VALUES ('$soldItem_UserID', '$soldItem_Title', '$soldItem_StartingPrice', '$buyer_Price', '$buyer_EMail', '$buyer_Name', '$soldItem_EndDate');";
+		mysqli_query($link, $sql_in);
+	}
+	else
+	{
+		$sql_in = "INSERT INTO SoldItems (Seller_UserID, Seller_SoldItemName, Seller_SoldItemStartingPrice, Buyer_BidPrice, Buyer_EMail, Buyer_Name, Seller_AuctionEndDate) VALUES ('$soldItem_UserID', '$soldItem_Title', '$soldItem_StartingPrice', 0, ".'"'."-".'"'.", ".'"'."-".'"'.", '$soldItem_EndDate');";
+		mysqli_query($link, $sql_in);
+	}
+}
+//EDDIG------------------------------
+
 //lejárt hirdetések
 $sql = "DELETE FROM item WHERE enddate < NOW();";
 $link->query($sql);
-
 
 //keresés
 if(isset($_POST['search_btn']))
@@ -166,10 +199,10 @@ if(isset($_POST['search_btn']))
 				{
 				echo '<div class="col-lg-4 col-md-6 mb-4">
                     <div class="card text-justify h-100">
-                    <a href="loggedIn_itempage.php?Item_ID='.$row['Item_ID'].'"><img class="card-img-top" src="Pictures/'.$row['Picture'].'" alt=""></a>
+                    <a href="itempage.php?Item_ID='.$row['Item_ID'].'"><img class="card-img-top" src="Pictures/'.$row['Picture'].'" alt=""></a>
                         <div class="card-body">
                             <h4 class="card-title text-center">
-                              <a href="itempage.php?itemid='.$row['Item_ID'].'">'.$row['Title'].'</a>
+                              <a href="itempage.php?Item_ID='.$row['Item_ID'].'">'.$row['Title'].'</a>
                             </h4>
                             <h5>Jelenlegi licit: '.$row['BidPrice'].' Ft</h5>
                             <h6>Kezdő ár: '.$row['StartingPrice'].' Ft</h6>

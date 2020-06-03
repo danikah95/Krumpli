@@ -47,6 +47,9 @@
 			<li class="nav-item active">
             <a class="nav-link" href="loggedIn_index.php">Főoldal</a>
           </li>
+		  <li class="nav-item">
+            <a class="nav-link" href="solditemlist.php">Eladott termékek</a>
+          </li>
           <li class="nav-item">
             <a class="nav-link" href="hirdetesfeladas.php">Hirdetésfeladás</a>
           </li>
