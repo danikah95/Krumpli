@@ -15,18 +15,23 @@
 		
 		$sessionEmail = $_SESSION["EMail"];
 		$Lastname = $Firstname = "";
-		
-		$sql = "SELECT Lastname, Firstname FROM registeredusers WHERE EMail like " . '"' . $sessionEmail . '"' . ";";
-		$result = mysqli_query($conn, $sql);
-		while($row = mysqli_fetch_assoc($result))
-		{
-			$Lastname = $row["Lastname"];
-			$Firstname = $row["Firstname"];
-		}
-		
-		$FullName = $Lastname . " " . $Firstname;
-		
+
+		$sql = "SELECT Lastname, Firstname, AdminCheck FROM registeredusers WHERE EMail like " . '"' . $sessionEmail . '"' . ";";
+        $result = mysqli_query($conn, $sql);
+        while($row = mysqli_fetch_assoc($result))
+        {
+            $Lastname = $row["Lastname"];
+            $Firstname = $row["Firstname"];
+            $AdminCheck = $row["AdminCheck"];
+        }
+        $FullName = $Lastname . " " . $Firstname;
+        if ($AdminCheck == 1)
+        {
+          header('Location: admin.php');
+        }
 		mysqli_close($conn);
+
+
 	}
 	else
 	{
@@ -71,6 +76,39 @@ while ($adatok=mysqli_fetch_array($item))
     $i++;
 }*/
 
+//SAJÁT RÉSZ------------------------------
+$sql = "SELECT Item_ID, EndDate, StartingPrice, Title, User_ID FROM Item WHERE enddate < NOW();";
+$result = mysqli_query($link, $sql);
+while($row = mysqli_fetch_assoc($result))
+{
+	$soldItem_ItemID = $row['Item_ID'];
+	$soldItem_EndDate = $row['EndDate'];
+	$soldItem_StartingPrice = $row['StartingPrice'];
+	$soldItem_Title = $row['Title'];
+	$soldItem_UserID = $row['User_ID'];
+	
+	$sql_in = "SELECT COUNT(*) as db, b.BidPrice, ru.Lastname, ru.Firstname, ru.EMail FROM bid b join registeredusers ru on b.User_ID = ru.User_ID WHERE Item_ID = '$soldItem_ItemID';";
+	$result_in = mysqli_query($link, $sql_in);
+	while($row_in = mysqli_fetch_assoc($result_in))
+	{
+		$checkBid = $row_in['db'];
+		$buyer_Price = $row_in['BidPrice'];
+		$buyer_Name = $row_in['Lastname'] . " " . $row_in['Firstname'];
+		$buyer_EMail = $row_in['EMail'];
+	}
+	
+	if ($checkBid > 0)
+	{
+		$sql_in = "INSERT INTO SoldItems (Seller_UserID, Seller_SoldItemName, Seller_SoldItemStartingPrice, Buyer_BidPrice, Buyer_EMail, Buyer_Name, Seller_AuctionEndDate) VALUES ('$soldItem_UserID', '$soldItem_Title', '$soldItem_StartingPrice', '$buyer_Price', '$buyer_EMail', '$buyer_Name', '$soldItem_EndDate');";
+		mysqli_query($link, $sql_in);
+	}
+	else
+	{
+		$sql_in = "INSERT INTO SoldItems (Seller_UserID, Seller_SoldItemName, Seller_SoldItemStartingPrice, Buyer_BidPrice, Buyer_EMail, Buyer_Name, Seller_AuctionEndDate) VALUES ('$soldItem_UserID', '$soldItem_Title', '$soldItem_StartingPrice', 0, ".'"'."-".'"'.", ".'"'."-".'"'.", '$soldItem_EndDate');";
+		mysqli_query($link, $sql_in);
+	}
+}
+//EDDIG------------------------------
 
 //lejárt hirdetések
 $sql = "DELETE FROM item WHERE enddate < NOW();";
@@ -100,6 +138,7 @@ if(isset($_POST['search_btn']))
 				$filter_Result = mysqli_query($connect, $query);
 				return $filter_Result;
 			}
+
 
 
 ?>
@@ -136,6 +175,9 @@ if(isset($_POST['search_btn']))
       <div class="collapse navbar-collapse" id="navbarResponsive">
         <ul class="navbar-nav ml-auto">
           
+		  <li class="nav-item">
+            <a class="nav-link" href="solditemlist.php">Eladott termékek</a>
+          </li>
           <li class="nav-item">
             <a class="nav-link" href="hirdetesfeladas.php">Hirdetésfeladás</a>
           </li>

@@ -16,17 +16,20 @@ if(isset($_SESSION["bTechLoggedIn"]) && $_SESSION["bTechLoggedIn"] == true)
     $sessionEmail = $_SESSION["EMail"];
     $Lastname = $Firstname = "";
     
-    $sql = "SELECT Lastname, Firstname FROM registeredusers WHERE EMail like " . '"' . $sessionEmail . '"' . ";";
-    $result = mysqli_query($conn, $sql);
-    while($row = mysqli_fetch_assoc($result))
-    {
-        $Lastname = $row["Lastname"];
-        $Firstname = $row["Firstname"];
-    }
-    
-    $FullName = $Lastname . " " . $Firstname;
-    
-    mysqli_close($conn);
+    $sql = "SELECT Lastname, Firstname, AdminCheck FROM registeredusers WHERE EMail like " . '"' . $sessionEmail . '"' . ";";
+        $result = mysqli_query($conn, $sql);
+        while($row = mysqli_fetch_assoc($result))
+        {
+            $Lastname = $row["Lastname"];
+            $Firstname = $row["Firstname"];
+            $AdminCheck = $row["AdminCheck"];
+        }
+        $FullName = $Lastname . " " . $Firstname;
+        if ($AdminCheck == 1)
+        {
+          header('Location: admin.php');
+        }
+		mysqli_close($conn);
 }
 else
 {
@@ -85,6 +88,9 @@ $row=mysqli_fetch_assoc($result);
         <ul class="navbar-nav ml-auto">
           <li class="nav-item">
             <a class="nav-link" href="loggedIn_index.php">Főoldal</a>
+          </li>
+		  <li class="nav-item">
+            <a class="nav-link" href="solditemlist.php">Eladott termékek</a>
           </li>
           <li class="nav-item">
             <a class="nav-link" href="hirdetesfeladas.php">Hirdetésfeladás</a>
