@@ -46,27 +46,40 @@ if (!$conn) {
     die("Connection failed: " . mysqli_connect_error());
 }
 
-    $email = ($_POST['EMail']);
-	$password = ($_POST['UserPassword']);
+  $email = ($_POST['EMail']);
+  $password = ($_POST['UserPassword']);
 	$hpw=md5($password);
 
 
-	$sql = "SELECT UserPassword FROM registeredusers WHERE EMail='$email'";
-	$result = mysqli_query($conn, $sql);
+$sql = "SELECT UserPassword,AdminCheck FROM registeredusers WHERE EMail='$email'";
+$result = mysqli_query($conn, $sql);
 
 if (mysqli_num_rows($result) > 0)
 {
     // output data of each row
-    while($row = mysqli_fetch_assoc($result))
+  while($row = mysqli_fetch_assoc($result))
 	{
+
 		if($hpw == $row["UserPassword"])
 		{
-			//echo "Sikeres bejelentkezés<br>";
-			session_start();
-			$_SESSION["bTechLoggedIn"] = true;
-			$_SESSION["EMail"] = $email;
-			//header('Location: loggedIn_index.php');
-			fun_alert ("Sikeres bejelentkezés!", "loggedIn_index.php");
+      if($row["AdminCheck"]==1)
+      {
+			  session_start();
+			  $_SESSION["bTechLoggedIn"] = true;
+        $_SESSION["EMail"] = $email;
+
+			  fun_alert ("Sikeres bejelentkezés!", "admin.php");
+      }
+      else
+      {
+			  session_start();
+			  $_SESSION["bTechLoggedIn"] = true;
+			  $_SESSION["EMail"] = $email;
+
+			  fun_alert ("Sikeres bejelentkezés!", "hirlevel.php");
+      }
+  
+			
 		}
 		else
 		{
